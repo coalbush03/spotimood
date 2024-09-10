@@ -24,7 +24,28 @@ sp=spotipy.Spotify(
     )
 )
 
-top_tracks=sp.current_user_top_tracks(limit=50, offset=0, time_range='short_term')
-track_names=[track['name'] for track in top_tracks['items']]
-print(track_names)
+
+top_tracks=sp.current_user_top_tracks(limit=50, offset=0, time_range='short_term') #top 50 recent tracks of the user
+track_info=[]
+
+for track in top_tracks['items']: #relevant info about tracks (id to join with features)
+    track_info.append({
+        'name':track['name'],
+        'artist':track['artists'][0]['name'],
+        'id':track['id']
+    })
+
+track_info_df=pd.DataFrame(track_info)
+
+track_features=sp.audio_features([track['id'] for track in top_tracks['items']]) #audio features of the tracks
+track_features_df=pd.DataFrame(track_features)
+
+top_50_df=pd.merge(track_info_df, track_features_df, on='id') #both dataframes joined on id
+
+print(top_50_df.columns)
+print(top_50_df)
+
+
+
+
 
